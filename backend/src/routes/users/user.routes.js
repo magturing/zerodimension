@@ -18,6 +18,8 @@ import {
     isAuthorizedUser,
 } from "../../middlewares/authentication/auth.middleware.js";
 import { changePasswordRateLimiter } from "../../utils/rateLimiter.js";
+import { upload } from "../../utils/multer.js";
+import { uploadFile } from "../../controllers/users/upload.controllers.js";
 
 
 router.route("/signup").post(signUp);
@@ -28,6 +30,9 @@ router.route("/me").get(isAuthenticated,myProfile).patch(isAuthenticated,updateU
 router.route("/changePassword").post(isAuthenticated,changePasswordRateLimiter,changePassword);
 router.route("/delete/me").delete(isAuthenticated,deleteUser);
 router.route("/logout").post(isAuthenticated,logout);
+
+// Routes to handle file uploads and related functionality..
+router.route("/upload").post(isAuthenticated,upload.single("zipfile"),uploadFile);
 
 
 
