@@ -196,6 +196,7 @@
     "undefsafe": "^2.0.5",
     "undici-types": "^6.21.0",
     "unpipe": "^1.0.0",
+    "unzipper": "^0.12.3",
     "util-deprecate": "^1.0.2",
     "utils-merge": "^1.0.1",
     "uuid": "^11.1.0",

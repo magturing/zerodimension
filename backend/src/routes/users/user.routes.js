@@ -18,7 +18,7 @@ import {
     isAuthorizedUser,
 } from "../../middlewares/authentication/auth.middleware.js";
 import { changePasswordRateLimiter } from "../../utils/rateLimiter.js";
-import { upload } from "../../utils/multer.js";
+import { upload } from "../../middlewares/fileUpload/multer.js";
 import { uploadFile } from "../../controllers/users/upload.controllers.js";
 
 

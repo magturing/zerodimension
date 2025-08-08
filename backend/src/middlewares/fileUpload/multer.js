@@ -3,6 +3,8 @@ import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from "uuid";
 import { fileURLToPath } from "url";
+import unzipper from "unzipper";
+
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -15,7 +17,7 @@ const storage = multer.diskStorage({
       const __filename = fileURLToPath(import.meta.url);
       const __dirname = path.dirname(__filename);
 
-      const dir = path.join(__dirname, "..", "uploads", userId, scanId);
+      const dir = path.join(__dirname, "../../../", "uploads", userId, scanId);
 
       fs.mkdirSync(dir, { recursive: true });
 
@@ -51,4 +53,27 @@ const upload = multer({
   },
 });
 
-export { upload };
+
+
+/**
+ * Extracts uploaded ZIP file to a subfolder named "unzipped"
+ * @param {string} zipPath - Full path to uploaded ZIP file
+ * @param {string} outputDir - Path where to extract (e.g., /unzipped)
+ */
+const extractZip = async (zipPath, outputDir) => {
+  try {
+    await fs.createReadStream(zipPath)
+      .pipe(unzipper.Extract({ path: outputDir }))
+      .promise();
+    return { success: true, message: "ZIP extracted successfully." };
+  } catch (error) {
+    console.error("ZIP extraction failed:", error);
+    return { success: false, error: error.message };
+  }
+};
+
+
+export { 
+  upload,
+  extractZip
+};
