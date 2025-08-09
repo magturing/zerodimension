@@ -1,36 +1,27 @@
 import app from "./app.js";
 import { connectToDb } from "./db/connectToDB.js";
-import {startCronJobs} from "./src/cronJobs/deleteUsers.js";
+import { startCronJobs } from "./src/cronJobs/deleteUsers.js";
 import { connectRedis } from "./db/redis.js";
+import { startScanWorker } from "./queues/scanWorker.js"; // <-- New import
 
-
-/**
- * Connecting to DataBase
- */
 connectToDb()
-    .then((conn) => {
-        console.log(`DataBase connected successfully to ${conn.connection.host}`);
+  .then(async (conn) => {
+    console.log(`DataBase connected successfully to ${conn.connection.host}`);
 
-        /**
-         * Running cron-jobs..
-         */
-        startCronJobs();
-        /**
-         * Starting the server.
-         */
-        app.listen(process.env.PORT,process.env.HOST,() => {
-            console.log(`server is running on ${process.env.HOST}:${process.env.PORT}`);
-        });
+    // Connect to Redis before starting workers
+    await connectRedis();
 
-        /**
-         * Connecting to Redis
-         */
-        connectRedis();
-    })
-    .catch((err) => {
-        console.log(`Error connecting to DB app is not running ${err}`);
-    })
+    // Start cron jobs
+    startCronJobs();
 
+    // Start background worker AFTER Redis is ready
+    startScanWorker();
 
-    
-   
+    // Start the server
+    app.listen(process.env.PORT, process.env.HOST, () => {
+      console.log(`server is running on ${process.env.HOST}:${process.env.PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.log(`Error connecting to DB app is not running ${err}`);
+  });

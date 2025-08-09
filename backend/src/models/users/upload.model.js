@@ -1,6 +1,40 @@
 import mongoose, { Schema } from "mongoose";
 import { v4 as uuidv4 } from "uuid";
 
+const vulnerabilitySchema = new Schema({
+  name: { 
+    type: String, 
+    required: true 
+  }, 
+  description: { 
+    type: String, 
+    required: true 
+  }, 
+  file: { 
+    type: String, 
+    required: true 
+  }, 
+  line: { 
+    type: Number, 
+    required: true 
+  }, 
+  severity: { 
+    type: String, 
+    enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"], 
+    required: true 
+  },
+  codeSnippet: { 
+    type: String, 
+    required: true 
+  }, 
+  remediation: { 
+    type: String, 
+    required: true 
+   } 
+}, { _id: false });
+
+
+
 const uploadSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
@@ -18,10 +52,10 @@ const uploadSchema = new Schema({
     required: [true, "File name is required"]
   },
   fileSize: {
-    type: Number // in bytes
+    type: Number
   },
   fileType: {
-    type: String // e.g., "application/zip"
+    type: String
   },
   uploadPath: {
     type: String,
@@ -49,6 +83,12 @@ const uploadSchema = new Schema({
     type: String,
     default: ""
   },
+  scanResults: {
+    vulnerabilities: [vulnerabilitySchema] 
+  },
+  scanCompletedAt: {
+    type: Date
+  },
   errorLog: {
     type: String,
     select: false
@@ -56,19 +96,14 @@ const uploadSchema = new Schema({
   deleted: {
     type: Boolean,
     default: false,
-    select:false
+    select: false
   },
   sourceIP: {
     type: String
   },
   userAgent: {
     type: String
-  },
-  // Optional: future feature support
-//   projectId: {
-//     type: Schema.Types.ObjectId,
-//     ref: "Project"
-//   }
+  }
 }, { timestamps: true });
 
 export const Upload = mongoose.model("Upload", uploadSchema);

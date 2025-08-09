@@ -19,7 +19,7 @@ import {
 } from "../../middlewares/authentication/auth.middleware.js";
 import { changePasswordRateLimiter } from "../../utils/rateLimiter.js";
 import { upload } from "../../middlewares/fileUpload/multer.js";
-import { uploadFile } from "../../controllers/users/upload.controllers.js";
+import { getAllScanResult, uploadFile } from "../../controllers/users/upload.controllers.js";
 
 
 router.route("/signup").post(signUp);
@@ -33,6 +33,7 @@ router.route("/logout").post(isAuthenticated,logout);
 
 // Routes to handle file uploads and related functionality..
 router.route("/upload").post(isAuthenticated,upload.single("zipfile"),uploadFile);
+router.route("/upload/:id").get(isAuthenticated,getAllScanResult);
 
 
 

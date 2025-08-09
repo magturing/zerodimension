@@ -3,6 +3,7 @@ import ErrorHandler from "../../utils/errorHandler.js";
 import { Upload } from "../../models/users/upload.model.js";
 import { extractZip } from "../../middlewares/fileUpload/multer.js";
 import path from "path";
+import { addScanJob } from "../../../queues/scanQueue.js";
 
 
 const uploadFile = catchAsyncError(async (req, res, next) => {
@@ -38,6 +39,8 @@ const uploadFile = catchAsyncError(async (req, res, next) => {
     });
   }
 
+  await addScanJob(scanId, uploadPath + '/uploaded.zip');
+
   return res.status(201).json({
     message: "File uploaded and extracted successfully",
     uploadId: scanId,
@@ -46,6 +49,35 @@ const uploadFile = catchAsyncError(async (req, res, next) => {
 });
 
 
+const getAllScanResult = catchAsyncError(async (req, res, next) => {
+    const id = req.user._id;
+
+    const results = await Upload.find({ userId: id });
+
+    res.status(200).json({
+        success: true,
+        results
+    });
+});
+
+const getScanResultById = catchAsyncError(async (req, res, next) => {
+    const id = req.user._id;
+    const { uploadId } = req.params;
+
+    const upload = await Upload.findOne({ uploadId, userId: id });
+
+    if (!upload) {
+        return next(new ErrorHandler("UNAUTHORIZED or File not found", 401));
+    }
+
+    res.status(200).json({
+        success: true,
+        upload
+    });
+});
+
 export { 
-    uploadFile
+    uploadFile,
+    getAllScanResult,
+    getScanResultById
 };
